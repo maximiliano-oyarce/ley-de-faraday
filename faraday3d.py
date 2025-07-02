@@ -1,24 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from matplotlib.patches import Circle
-from mpl_toolkits.mplot3d import Axes3D
-import math
 
 class FaradaySimulation:
     def __init__(self, num_vueltas=1):
-        """
-        Simulación de la Ley de Faraday
-        
-        La Ley de Faraday establece que:
-        ε = -N * dΦ/dt
-        
-        Donde:
-        ε = Fuerza electromotriz inducida (EMF)
-        N = Número de vueltas de la espira
-        Φ = Flujo magnético
-        dΦ/dt = Cambio del flujo magnético con respecto al tiempo
-        """
+        "Simulación de la Ley de Faraday"
         self.num_vueltas = num_vueltas
         self.radio_espira = 1.0  # Radio de la espira en metros
         self.area_espira = np.pi * self.radio_espira**2
@@ -47,7 +33,7 @@ class FaradaySimulation:
         self.setup_plots()
         
     def setup_plots(self):
-        """Configurar los gráficos"""
+        "Configurar los gráficos"
         # Subplot 1: Animación 3D de la espira y campo magnético
         self.ax1.set_xlim([-2, 2])
         self.ax1.set_ylim([-2, 2])
@@ -103,24 +89,19 @@ class FaradaySimulation:
                                        bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.8))
         
     def calcular_campo_magnetico(self, t):
-        """Calcular el campo magnético en función del tiempo"""
+        "Calcula en función del tiempo"
         return self.B_max * np.cos(self.omega * t)
     
     def calcular_flujo_magnetico(self, B):
-        """Calcular el flujo magnético Φ = B · A"""
         return B * self.area_espira
     
     def calcular_emf_inducida(self, t):
-        """Calcular la EMF inducida usando la ley de Faraday"""
-        # dΦ/dt = d(B·A)/dt = A·dB/dt
-        # dB/dt para B(t) = B_max * cos(ωt) es: -B_max * ω * sin(ωt)
         dB_dt = -self.B_max * self.omega * np.sin(self.omega * t)
         dPhi_dt = self.area_espira * dB_dt
         emf = -self.num_vueltas * dPhi_dt
         return emf
     
     def dibujar_campo_magnetico_3d(self, B, ax):
-        """Dibujar las líneas de campo magnético en 3D - Versión optimizada"""
         # Limpiar solo los elementos del campo magnético anterior
         collections_to_remove = []
         for collection in ax.collections:
@@ -173,8 +154,8 @@ class FaradaySimulation:
                                    linewidth=1)
                 flujo_line[0].campo_magnetico = True
     
-    def animate(self, frame):
-        """Función de animación optimizada"""
+    def animacion(self, frame):
+        "Función de animación"
         t = frame * 0.05  # Incremento de tiempo
         
         # Calcular valores físicos
@@ -247,12 +228,12 @@ class FaradaySimulation:
         return [self.line_B, self.line_emf]  # Devolver menos elementos para blit optimizado
     
     def ejecutar_simulacion(self, duracion=10):
-        """Ejecutar la simulación optimizada"""
+        """Ejecutar la simulación"""
         frames = int(duracion / 0.05)
         
-        # Crear animación con configuración optimizada
+        # Crea la animación
         self.anim = animation.FuncAnimation(
-            self.fig, self.animate, frames=frames, 
+            self.fig, self.animacion, frames=frames, 
             interval=40, blit=False, repeat=True,  # Intervalo reducido para mayor fluidez
             cache_frame_data=False  # No almacenar frames en caché para ahorrar memoria
         )
@@ -262,7 +243,7 @@ class FaradaySimulation:
         
         # Mostrar ecuaciones de Faraday
         ecuacion_text = (
-            "Ley de Faraday 3D (Optimizada):\n"
+            "Ley de Faraday 3D:\n"
             "ε = -N × dΦ/dt\n"
             f"ε = -{self.num_vueltas} × d(B×A)/dt\n"
             f"A = π×r² = {self.area_espira:.3f} m²\n"
@@ -276,12 +257,8 @@ class FaradaySimulation:
         plt.show()
 
 def main():
-    """Función principal del programa"""
-    print("=== SIMULACIÓN DE LA LEY DE FARADAY ===")
     print()
-    print("La Ley de Faraday establece que la fuerza electromotriz inducida (EMF)")
-    print("en una espira es proporcional al cambio del flujo magnético con el tiempo:")
-    print("ε = -N × dΦ/dt")
+    print("=== SIMULACIÓN DE LA LEY DE FARADAY ===")
     print()
     
     # Solicitar entrada del usuario
@@ -296,23 +273,6 @@ def main():
             print("Por favor, ingrese un número entero válido.")
     
     print(f"\nCreando simulación con {num_vueltas} vueltas...")
-    print("\nLa animación mostrará:")
-    print("- Izquierda: Espira conductora 3D con campo magnético variable")
-    print("- Centro: Campo magnético B(t) vs tiempo")
-    print("- Derecha: EMF inducida ε(t) vs tiempo")
-    print("\nNota: El campo magnético cambia sinusoidalmente perpendicular al plano.")
-    print("      Vectores rojos = campo hacia arriba (+Z)")
-    print("      Vectores azules = campo hacia abajo (-Z)")
-    print("      La espira cambia de color según la EMF inducida")
-    print("      La vista 3D rota suavemente para mejor visualización")
-    print("\nOptimizaciones aplicadas para tiempo real:")
-    print("- Reducción de densidad de vectores de campo magnético")
-    print("- Actualización selectiva de elementos gráficos por frames")
-    print("- Rotación de vista más lenta y suave")
-    print("- Límite en el número de vueltas visibles (máx. 5)")
-    print("- Intervalo de animación optimizado (40ms)")
-    print("- Renderizado optimizado sin almacenamiento en caché")
-    print("\n¡Cerrando la ventana se terminará la simulación!")
     
     # Crear y ejecutar la simulación
     simulacion = FaradaySimulation(num_vueltas)
