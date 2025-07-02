@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-class LeyFaraday:
+class Faraday_2D:
     def __init__(self):
         self.mu_0 = 4 * np.pi * 1e-7  # Permeabilidad del vacío (H/m)
         
@@ -173,7 +173,7 @@ class LeyFaraday:
 
 def main():
     # Crear instancia de la clase
-    faraday = LeyFaraday()
+    faraday = Faraday_2D()
     
     # Ejecutar demostración principal
     resultados = faraday.demo_ley_faraday()

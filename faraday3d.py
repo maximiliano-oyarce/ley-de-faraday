@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-class FaradaySimulation:
+class Faraday_3D:
     def __init__(self, num_vueltas=1, radio_espira=1.0, B_max=2.0, frecuencia=0.5):
         "Simulación de la Ley de Faraday"
         self.num_vueltas = num_vueltas
@@ -230,7 +230,6 @@ class FaradaySimulation:
         return [self.line_B, self.line_emf]  # Devolver menos elementos para blit optimizado
     
     def ejecutar_simulacion(self, duracion=10):
-        """Ejecutar la simulación"""
         frames = int(duracion / 0.05)
         
         # Crea la animación
@@ -411,7 +410,7 @@ def main():
     input("Presione Enter para iniciar la simulación...")
     
     # Crear y ejecutar la simulación
-    simulacion = FaradaySimulation(num_vueltas, radio_espira, B_max, frecuencia)
+    simulacion = Faraday_3D(num_vueltas, radio_espira, B_max, frecuencia)
     simulacion.ejecutar_simulacion(duracion=duracion)
 
 if __name__ == "__main__":
