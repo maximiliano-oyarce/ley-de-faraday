@@ -3,15 +3,15 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 class FaradaySimulation:
-    def __init__(self, num_vueltas=1):
+    def __init__(self, num_vueltas=1, radio_espira=1.0, B_max=2.0, frecuencia=0.5):
         "Simulación de la Ley de Faraday"
         self.num_vueltas = num_vueltas
-        self.radio_espira = 1.0  # Radio de la espira en metros
+        self.radio_espira = radio_espira  # Radio de la espira en metros
         self.area_espira = np.pi * self.radio_espira**2
         
         # Parámetros del campo magnético
-        self.B_max = 2.0  # Tesla - Campo magnético máximo
-        self.frecuencia = 0.5  # Hz - Frecuencia de oscilación del campo
+        self.B_max = B_max  # Tesla - Campo magnético máximo
+        self.frecuencia = frecuencia  # Hz - Frecuencia de oscilación del campo
         self.omega = 2 * np.pi * self.frecuencia  # Frecuencia angular
         
         # Arrays para almacenar datos
@@ -22,7 +22,7 @@ class FaradaySimulation:
         
         # Configuración de la figura
         self.fig = plt.figure(figsize=(18, 6))
-        self.fig.suptitle(f'Simulación de la Ley de Faraday (N = {self.num_vueltas} vueltas)', fontsize=16)
+        self.fig.suptitle(f'Simulación de la Ley de Faraday (N={self.num_vueltas}, r={self.radio_espira:.2f}m, B_max={self.B_max:.1f}T, f={self.frecuencia:.2f}Hz)', fontsize=14)
         
         # Crear subplots: 3D para la espira, 2D para los gráficos
         self.ax1 = self.fig.add_subplot(131, projection='3d')
@@ -35,8 +35,10 @@ class FaradaySimulation:
     def setup_plots(self):
         "Configurar los gráficos"
         # Subplot 1: Animación 3D de la espira y campo magnético
-        self.ax1.set_xlim([-2, 2])
-        self.ax1.set_ylim([-2, 2])
+        # Ajustar límites basados en el radio de la espira
+        limite = max(2, self.radio_espira * 2.5)
+        self.ax1.set_xlim([-limite, limite])
+        self.ax1.set_ylim([-limite, limite])
         self.ax1.set_zlim([-1, 1])
         self.ax1.set_title('Espira Conductora 3D y Campo Magnético')
         self.ax1.set_xlabel('X (m)')
@@ -256,15 +258,15 @@ class FaradaySimulation:
         plt.tight_layout()
         plt.show()
 
-def main():
-    print()
-    print("=== SIMULACIÓN DE LA LEY DE FARADAY ===")
+def solicitar_parametros():
+    """Solicita al usuario todos los parámetros de la simulación"""
+    print("=== CONFIGURACIÓN DE PARÁMETROS ===")
     print()
     
-    # Solicitar entrada del usuario
+    # Número de vueltas
     while True:
         try:
-            num_vueltas = int(input("Ingrese el número de vueltas de la espira (entero positivo): "))
+            num_vueltas = int(input("Ingrese el número de vueltas de la espira (entero positivo, recomendado 1-10): "))
             if num_vueltas > 0:
                 break
             else:
@@ -272,11 +274,145 @@ def main():
         except ValueError:
             print("Por favor, ingrese un número entero válido.")
     
-    print(f"\nCreando simulación con {num_vueltas} vueltas...")
+    # Radio de la espira
+    while True:
+        try:
+            radio_espira = float(input("Ingrese el radio de la espira en metros (recomendado 0.5-3.0): "))
+            if radio_espira > 0:
+                break
+            else:
+                print("Por favor, ingrese un número positivo.")
+        except ValueError:
+            print("Por favor, ingrese un número válido.")
+    
+    # Campo magnético máximo
+    while True:
+        try:
+            B_max = float(input("Ingrese la intensidad máxima del campo magnético en Tesla (recomendado 0.5-5.0): "))
+            if B_max > 0:
+                break
+            else:
+                print("Por favor, ingrese un número positivo.")
+        except ValueError:
+            print("Por favor, ingrese un número válido.")
+    
+    # Frecuencia
+    while True:
+        try:
+            frecuencia = float(input("Ingrese la frecuencia de oscilación del campo en Hz (recomendado 0.1-2.0): "))
+            if frecuencia > 0:
+                break
+            else:
+                print("Por favor, ingrese un número positivo.")
+        except ValueError:
+            print("Por favor, ingrese un número válido.")
+    
+    # Duración de la simulación
+    while True:
+        try:
+            duracion = float(input("Ingrese la duración de la simulación en segundos (recomendado 10-30): "))
+            if duracion > 0:
+                break
+            else:
+                print("Por favor, ingrese un número positivo.")
+        except ValueError:
+            print("Por favor, ingrese un número válido.")
+    
+    return num_vueltas, radio_espira, B_max, frecuencia, duracion
+
+def usar_configuracion_rapida():
+    """Permite al usuario elegir una configuración predefinida"""
+    print("=== CONFIGURACIONES PREDEFINIDAS ===")
+    print("1. Configuración básica (N=1, r=1.0m, B=2.0T, f=0.5Hz)")
+    print("2. Espira pequeña, alta frecuencia (N=5, r=0.5m, B=3.0T, f=1.5Hz)")
+    print("3. Espira grande, baja frecuencia (N=3, r=2.0m, B=1.0T, f=0.2Hz)")
+    print("4. Campo magnético intenso (N=2, r=1.5m, B=5.0T, f=1.0Hz)")
+    print("5. Configuración personalizada")
+    print()
+    
+    while True:
+        try:
+            opcion = int(input("Seleccione una opción (1-5): "))
+            if 1 <= opcion <= 5:
+                break
+            else:
+                print("Por favor, seleccione una opción válida (1-5).")
+        except ValueError:
+            print("Por favor, ingrese un número válido.")
+    
+    configuraciones = {
+        1: (1, 1.0, 2.0, 0.5, 20),
+        2: (5, 0.5, 3.0, 1.5, 15),
+        3: (3, 2.0, 1.0, 0.2, 25),
+        4: (2, 1.5, 5.0, 1.0, 20)
+    }
+    
+    if opcion == 5:
+        return solicitar_parametros()
+    else:
+        num_vueltas, radio_espira, B_max, frecuencia, duracion = configuraciones[opcion]
+        print(f"\nConfiguración seleccionada:")
+        print(f"- Vueltas: {num_vueltas}")
+        print(f"- Radio: {radio_espira} m")
+        print(f"- Campo magnético máximo: {B_max} T")
+        print(f"- Frecuencia: {frecuencia} Hz")
+        print(f"- Duración: {duracion} s")
+        return num_vueltas, radio_espira, B_max, frecuencia, duracion
+
+def main():
+    print()
+    print("=== SIMULACIÓN DE LA LEY DE FARADAY ===")
+    print()
+    print("Esta simulación permite visualizar cómo un campo magnético variable")
+    print("induce una fuerza electromotriz (EMF) en una espira conductora.")
+    print()
+    
+    # Preguntar al usuario el tipo de configuración
+    print("¿Cómo desea configurar la simulación?")
+    print("1. Usar configuración rápida (predefinida)")
+    print("2. Configuración personalizada completa")
+    print()
+    
+    while True:
+        try:
+            tipo_config = int(input("Seleccione una opción (1-2): "))
+            if tipo_config in [1, 2]:
+                break
+            else:
+                print("Por favor, seleccione 1 o 2.")
+        except ValueError:
+            print("Por favor, ingrese un número válido.")
+    
+    print()
+    
+    if tipo_config == 1:
+        num_vueltas, radio_espira, B_max, frecuencia, duracion = usar_configuracion_rapida()
+    else:
+        num_vueltas, radio_espira, B_max, frecuencia, duracion = solicitar_parametros()
+    
+    print(f"\nCreando simulación con los siguientes parámetros:")
+    print(f"- {num_vueltas} vueltas")
+    print(f"- Radio de {radio_espira} metros")
+    print(f"- Campo magnético máximo de {B_max} Tesla")
+    print(f"- Frecuencia de {frecuencia} Hz")
+    print(f"- Duración de {duracion} segundos")
+    print()
+    
+    # Calcular algunos valores derivados para mostrar al usuario
+    area = np.pi * radio_espira**2
+    omega = 2 * np.pi * frecuencia
+    emf_max = num_vueltas * B_max * omega * area
+    
+    print("Valores calculados:")
+    print(f"- Área de la espira: {area:.3f} m²")
+    print(f"- Frecuencia angular: {omega:.3f} rad/s")
+    print(f"- EMF máxima esperada: {emf_max:.3f} V")
+    print()
+    input("Presione Enter para iniciar la simulación...")
     
     # Crear y ejecutar la simulación
-    simulacion = FaradaySimulation(num_vueltas)
-    simulacion.ejecutar_simulacion(duracion=20)  # 20 segundos de simulación
+    simulacion = FaradaySimulation(num_vueltas, radio_espira, B_max, frecuencia)
+    simulacion.ejecutar_simulacion(duracion=duracion)
 
 if __name__ == "__main__":
     main()
