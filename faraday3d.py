@@ -84,10 +84,8 @@ class Faraday_3D:
         self.ax3.legend()
         
         # Texto para mostrar valores actuales
-        self.text_values = self.ax2.text(0.02, 0.98, '', fontsize=10, 
-                                       transform=self.ax2.transAxes, verticalalignment='top',
-                                       bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.8))
-        
+        self.text_values = self.ax2.text(0.02, 0.98, '', fontsize=10, transform=self.ax2.transAxes, verticalalignment='top', bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.8))                      
+
     def calcular_campo_magnetico(self, t):
         "Calcula en función del tiempo"
         return self.B_max * np.cos(self.omega * t)
@@ -131,10 +129,7 @@ class Faraday_3D:
                 color = 'blue'  # Campo hacia abajo (-Z)
             
             # Dibujar vectores de campo magnético
-            campo_collection = ax.quiver(X, Y, Z, U, V, W, 
-                                       color=color, alpha=0.7,
-                                       arrow_length_ratio=0.15, 
-                                       linewidth=1.5)
+            campo_collection = ax.quiver(X, Y, Z, U, V, W, color=color, alpha=0.7, arrow_length_ratio=0.15, linewidth=1.5)
             campo_collection.campo_magnetico = True
 
         # Líneas de flujo
@@ -147,9 +142,7 @@ class Faraday_3D:
                 x_flujo = r * np.cos(theta_flujo)
                 y_flujo = r * np.sin(theta_flujo)
                 z_flujo = np.zeros_like(theta_flujo)
-                flujo_line = ax.plot(x_flujo, y_flujo, z_flujo, 
-                                   color=color, alpha=0.4, 
-                                   linewidth=1)
+                flujo_line = ax.plot(x_flujo, y_flujo, z_flujo, color=color, alpha=0.4, linewidth=1)
                 flujo_line[0].campo_magnetico = True
     
     def animacion(self, frame):
